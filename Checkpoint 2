@@ -1,0 +1,34 @@
+GROUP 1- CHECKPOINT -2
+
+Team Members: Sriram, Aditya, Rakesh, Vikas
+
+Work done so far:
+
+We have a basic working implementation of our design.
+Modules completed in implementation:
+•	Random graph generation
+Generated a random graph on mininet framework i.e Switches, links between switches, bandwidth of links etc are decided and initial graph is setup.
+Hosts h1, h2 are linked to two random switches.
+
+•	Computing best path in random graph based on hops and bandwidth
+The best path between h1 and h2 is calculated. The initial metric used is bandwidth and no of hops. But this module can easily be extended to calculate best path using any other metric as weight of the links in the path. 
+
+•	Adding flow rules and establishing connectivity
+Flow rules were added to the initial graph. Once the best path between h1 and h2 is established, flow rules are added so that h1 can ping h2 and vice versa.
+
+•	Implementing Distributed voting mechanism with confidence score validation by a Switch Intelligence layer during link failure
+In order to measure the time taken to recover from a link failure, we pick a random link in the existing shortest path and remove it. Now multiple admins (malicious, non-malicious and those who misconfigure) would propose different new paths to connect h1 to h2. To deal with this we have done the following modules:
+•	ZooKeeper: Distributed consensus on who’s turn it is to vote is achieved using ZooKeeper. Wrapper function which allows our program to interact with ZooKeeper is done.
+•	Switch intelligence layer: This chooses the configuration of the non-malicious admin by evaluating the confidence score. The evaluation of the configuration also helps in identifying misconfiguration by a non-malicious admin. 3 types of administrators were implemented. 
+1)	Good intent – non-malicious
+2)	Good intent – non-malicious but misconfigured
+3)	Bad intent – malicious and intentionally fakes confidence
+Once a good configuration is picked, verified and finalized, new flow rules are added accordingly. Each configuration is evaluated by the switch intelligence layer. Only people who claim a confidence lower than a previous best confidence will vote. The switch intelligence layer will promulgate the confidence score to all admins at the end of each voting cycle.
+
+What Next:
+
+Run evaluations against 
+1)	Try some other metric combination. (We will upload graphs as and when we evaluate different metrics)
+2)	Different network topologies (sparse and dense Graphs)
+3)	Draw conclusions from the graph, make the poster and write the paper
+

@@ -1,0 +1,90 @@
+Useful Links
+    1. https://github.com/mininet/openflow-tutorial/wiki/Create-a-Learning-Switch (Mininet and POX details)
+    2. http://www.brianlinkletter.com/how-to-use-miniedit-mininets-graphical-user-interface/ (Using miniedit GUI)
+    3. http://archive.openflow.org/wk/index.php/OpenFlow_Tutorial (OpenFlow tutorial)
+
+Creating a simple network toplogy using Mininet
+    sudo mn --topo single,3 --mac --switch ovsk --controller remote
+
+    This asks mininet to create
+    1. 3 virtual hosts each with separate IP
+    2. 1 OpenFlow software switch in the kernel with 3 ports
+    3. Connect each host to the switch with a virtual cable
+    4. Set the MAC address of each host as equal to it's IP
+    5. Configure the switch to connect to a remote controller
+
+Mininet useful commands
+1. To get the list of nodes
+mininet> nodes
+available nodes are:
+c0 h1 h2 h3 s1
+
+2. To run a command on a single node
+mininet> h1 ifconfig
+
+3. Spawn an xterm for one or more hosts
+mininet> xterm h1 h2
+    (Before you run this command make sure that the Xterm session is running)
+
+DPCTL and useful commands
+1. Used to view a single switch's flow table
+2. Can be used to view flow state and flow counters
+3. Most OF switches can start up with a passive listening port (By default - 6634). You can use this to poll the switch without having to add debugging code to the controller
+4. To dump the port state and the capabilities
+    dpctl show tcp:127.0.0.1:6634
+5. To dump all the flow table entries for a switch
+    dpctl dump-flows tcp:127.0.0.1:6634
+    If the controller is not started yet then there would be no flows assigned to this switch
+6. Without any flow table entries the switch will not know how to forward the packets. We can use dpctl to manually add the flow table entries
+    1. Create a simple flow rule that allows host 1 to ping host 2
+        dpctl add-flow tcp:127.0.0.1:6634 in_port=1,actions=output:2 [This forwards packets coming at port 1 to port 2]
+        dpctl add-flow tcp:127.0.0.1:6634 in_port=2,actions=output:1 [This forwards packets coming at port 2 to port 1]
+        It is mandatory to set up the bidirectional flows else the ping commands would time out
+    2. Each flow rule by default has a default timeout option of 60 seconds. To by pass this we could create flowrules that have a longer default timeout
+        dpctl add-flow tcp:127.0.0.1:6634 in_port=1,idle_timeout=120,actions=output:2
+
+When using the GUI
+1. If we are using multiple controllers configure each controller to use a different port
+2. Always use start CLI
+3. Always quit the CLI by typing exit
+
+When using the terminal
+1. Switch configurations can be seen through OVS Summary
+2. To look at switch flow tables open a new terminal and run the following command
+    ovs-ofctl dump-flows <Switch name>
+3. To clean mininet after each run type the following command
+    sudo mn -c
+4. To run a custom topology python script run the command
+    sudo python <script_name.py>
+
+X Window system
+1. X is an architecture-independent system for remote graphical user interfaces and input device capabilities. Each person using a networked terminal has the ability to interact with the display with any type of user input device.
+2. X11 is the X Window System which allows you to run software on a UNIX/Linux server in a Windows-like way such that you can use your mouse to click around in it. The secure way to do this is to forward your X11 packets through your ssh conection which automatically sets your DISPLAY environment variable for you. Manually setting your DISPLAY environment variable opens your computer up to security risks.
+3. How to setup an X Window system on your machine
+    1. Download and install Xming
+    2. Enable X11 forwarding through Putty
+    3. If both these options are set then login to the VM and then type the following commans
+        $ xterm (If it opens a white window then you are all set)
+
+Difference between eth0, lo and wlan
+1. eth - This is the ethernet interface. eth0 is the first ethernet interface. Subsequent ethernet interfaces are named eth1, eth2 etc. This type of interface is usually a NIC connected to the network by a category 5 cable
+2. lo - Loopback interface. Special network interface that the system uses to communicate with itself
+3. wlan - Wireless network interface on the system. The first wireless interface is named wlan0 the subsequent ones are named wlan1, wlan2 etc
+4. For more details refer this link - http://www.computerhope.com/unix/uifconfi.htm
+5. To activate or deactivate these interfaces one can use the following commands
+    sudo ifconfig eth1 up
+    sudo ifconfig wlan0 down
+
+OpenFlow
+1. OpenFlow is an open interface for remotely controlling the forwarding tables in network switches, routers, and access points.
+2. Upon this low-level primitive, researchers can build networks with new high-level properties.
+3. The OpenFlow default port is 6633
+
+SDN Controllers
+1. A SDN Controller is an application in Software Defined Networking that manages flow control to enable intelligent networking. 2. SDN Controllers are based on protocols such as OpenFlow, that allow servers to tell switches where to send the packets.
+3. For our project we would be using the Python based SDN controller POX
+4. This sits above the OpenFlow interface while the switches sit below the OpenFlow interface
+
+What happens when a switch loses connectivity with a SDN Controller
+1. When an OpenFlow switch loses its connection to a controller, it will generally increase the period between which it attempts to contact the controller, up to a maximum of 15 seconds.
+2. If this is too long to wait, the switch can be configured to wait no more than N seconds using the --max-backoff parameter.

@@ -1,0 +1,47 @@
+Why we need ZooKeeper?
+    1. ZooKeeper is a distributed, open-source coordination service for distributed applications.
+    2. It exposes a simple set of primitives that distributed applications can build upon to implement higher level services for synchronization, configuration maintenance, groups and naming.
+    3. Uses a data model styled after the familiar directory tree structure of file systems
+    4. Coordination services are notoriously hard to get right. They are especially prone to errors such as race conditions and deadlock. The motivation behind ZooKeeper is to relieve distributed applications the responsibility of implementing coordination services from scratch.
+
+How the coordination happens
+    1. Distributed Applications coordinate with each other through a shared hierarchal namespace which is organized similarly to a standard file system. 
+    2. The name space consists of data registers - called znodes, in ZooKeeper parlance - and these are similar to files and directories. Unlike a typical file system, which is designed for storage, ZooKeeper data is kept in-memory, which means ZooKeeper can achieve high throughput and low latency numbers.
+    3. The ZooKeeper implementation puts a premium on high performance, highly available, strictly ordered access.
+    4. ZooKeeper can be replicated over a set of hosts called ensemble
+
+How the clients and the server communicate
+    Clients connect to a single ZooKeeper server. The client maintains a TCP connection through which it sends requests, gets responses, gets watch events, and sends heart beats. If the TCP connection to the server breaks, the client will connect to a different server.
+
+Nodes
+    ZooKeeper nodes can have both data as well as children
+    ZooKeeper nodes can store just small amounts of coordination data
+    One can perform read and write atomically on the data stored at each znode
+
+Ephemeral nodes
+    They are znodes
+    They exist as long as the session that creates it is active
+
+Watches
+    ZooKeeper supports the concept of watches
+    Clients can set a watch on a znode. A watch will be triggered when a znode changes
+
+Only the following operations are supported
+    1. create
+    2. delete
+    3. exists
+    4. get data
+    5. set data
+    6. get children
+    7. sync
+
+Checking if ZooKeeper is running
+    ps -ef | grep zoo
+    If you find any process running then kill it through kill -9 and start again
+
+Starting Zookeeper
+    cd /usr/local/home/cse222a01/zookeeper/zookeeper-3.5.1-alpha
+    bash bin/zkServer.sh start
+
+Where to find the log file
+    /usr/local/home/cse222a01/zookeeper/zookeeper-3.5.1-alpha/bin/../logs/
